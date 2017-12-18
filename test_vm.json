@@ -1,0 +1,35 @@
+curl -X POST \
+  https://<VCENTER>/rest/vcenter/vm \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'postman-token: 38575612-30f3-c144-6a36-ce4cf6d0ebac' \
+  -d '{
+    "spec": {
+        "name": "DCO_Centos7",
+        "guest_OS": "RHEL_7_64",
+        "placement" : {
+            "datastore": "Nimble-Stage-01",
+            "folder": "NixCore",
+            "resource_pool": ""
+        },
+        "memory": {
+          "size_MiB": 1024,
+          "hot_add_enabled": true
+        },
+        "floppies": [],
+        "cpu": {
+          "hot_remove_enabled": true,
+          "count": 1,
+          "hot_add_enabled": true,
+          "cores_per_socket": 1
+        },
+        "cdroms": [],
+        "disks": [
+            {
+                "new_vmdk": {
+                    "capacity": 32768
+                }
+            }
+        ]
+    }
+}'
