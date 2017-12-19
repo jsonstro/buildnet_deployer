@@ -470,10 +470,10 @@ else:
     
         if re.search('Centos7', host_os):
             if platform.system() == "Darwin" and verbose:
-                 os.system("cat profs7.txt")
+                 os.system("cat profiles/profs7.txt")
         elif re.search('RHEL6', host_os):
             if platform.system() == "Darwin" and verbose:
-                os.system("cat profs.txt")
+                os.system("cat profiles/profs.txt")
     
         if platform.system() != "Darwin" and verbose:
             os.system("cd %s && find . -maxdepth 1 -type f | grep app | sort --version-sort | cut -d'/' -f2" % profpath)

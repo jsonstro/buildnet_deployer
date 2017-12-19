@@ -282,7 +282,7 @@ def restart_host_network(hostname, username, ldap_pw):
         with settings(host_string=hs, password=ldap_pw):
             try:
                 hd = "/home/%s" % username
-                put("runit.sh", "%s/runit.sh" % hd, mode='750')
+                put("scripts/runit.sh", "%s/runit.sh" % hd, mode='750')
                 sudo("/usr/bin/screen -d -m %s/runit.sh; sleep 1" % hd, shell=True, timeout=0.5)
             except fe.CommandTimeout or fe.NetworkError:
                 pass
@@ -301,7 +301,7 @@ def run_cfengine(hostname, username, ldap_pw):
         with settings(host_string=hs, password=ldap_pw):
             try:
                 hd = "/home/%s" % username
-                put("cfengineit.sh", "%s/cfengineit.sh" % hd, mode='750')
+                put("scripts/cfengineit.sh", "%s/cfengineit.sh" % hd, mode='750')
                 sudo("/usr/bin/screen -d -m %s/cfengineit.sh; sleep 1" % hd, shell=True, timeout=0.5)
             except fe.CommandTimeout or fe.NetworkError:
                 pass
@@ -446,13 +446,13 @@ def set_host_static_ip(vserver, cnt, hostname, username, options):
                 try:
                     hd = "/home/%s" % username
                     if host_os == "RHEL6":
-                        put("cfengineit.sh", "%s/cfengineit.sh" % hd, mode='750')
+                        put("scripts/cfengineit.sh", "%s/cfengineit.sh" % hd, mode='750')
                         sudo("/usr/bin/screen -d -m %s/cfengineit.sh; sleep 1" % hd, shell=True, timeout=0.5)
                     ### TO DO ###
                     #else:
                         # Centos 7 so call chef, either from 'workstation/server' or client,
                         # this assumes we need to do some build net cleanup post-move...
-                        #put("chefit.sh", "%s/chefit.sh" % hd, mode='750')
+                        #put("scripts/chefit.sh", "%s/chefit.sh" % hd, mode='750')
                         #sudo("/usr/bin/screen -d -m %s/chefit.sh; sleep 1" % hd, shell=True, timeout=0.5)
                     sudo("service network restart", shell=False, timeout=0.5)
                 except fe.CommandTimeout:
@@ -477,7 +477,7 @@ def set_host_static_ip(vserver, cnt, hostname, username, options):
                 sudo("mv /tmp/rc.conf %s/rc.conf" % rcpath, shell=False)
                 try:
                     hd = "/home/%s" % username
-                    put("freebsdit.sh", "%s/freebsdit.sh" % hd, mode='750')
+                    put("scripts/freebsdit.sh", "%s/freebsdit.sh" % hd, mode='750')
                     sudo("/usr/bin/screen -d -m %s/freebsdit.sh; sleep 1" % hd, shell=True, timeout=0.5)
                 except fe.CommandTimeout:
                     pass
@@ -586,11 +586,13 @@ def main():
     vserver = VIServer()
     connect_vsphere()
 
+
     hostname = select_host(vserver, options)
     vm = vserver.get_vm_by_name(hostname)
 
     ifc, curvlan = get_current_vlan(vserver, vm, hostname)
     curhost = vm.properties.runtime.host.name
+
 
     print ""
     print "    Settings of VM '%s'   " % hostname
@@ -599,7 +601,9 @@ def main():
     print "Current HOST: %s" % curhost
     print ""
 
+
     destvlan = print_available_vlans(vserver, curhost, hostname, options)
+
 
     print ""
     print "NOTE --> Host will continue to use DHCP on new network if no static IP defined..."
@@ -613,7 +617,9 @@ def main():
     else:
         restart_host_network(hostname, esx_username, ldap_password)
 
+
     change_dvs_net(vserver, vm, hostname, destvlan, curvlan)
+
 
     if platform.system() != "Darwin":
         call(["/local/adm/infoblox-scripts/remove_dcnet_dns_from_hostmaster.sh", hostname])
